@@ -1,0 +1,148 @@
+package org.neteinstein.snap2sheet.ui.screens.signin
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import org.koin.compose.koinInject
+import org.neteinstein.snap2sheet.data.repository.AccountRepository
+import org.neteinstein.snap2sheet.ui.components.FaturaIcons
+import org.neteinstein.snap2sheet.ui.components.FaturaPrimaryButton
+import org.neteinstein.snap2sheet.ui.components.FaturaTopBar
+import org.neteinstein.snap2sheet.ui.components.IconBadge
+import org.neteinstein.snap2sheet.ui.theme.FaturaColors
+
+@Composable
+fun SignInScreen(
+    onBack: () -> Unit,
+    onSignedIn: () -> Unit,
+    accountRepository: AccountRepository = koinInject(),
+) {
+    Column(modifier = Modifier.fillMaxSize().background(FaturaColors.Surface)) {
+        FaturaTopBar(title = "", onBack = onBack)
+
+        Column(
+            modifier = Modifier.weight(1f).padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                IconBadge(size = 64.dp, cornerRadius = 18.dp) {
+                    FaturaIcons.Document(tint = FaturaColors.Accent, size = 30.dp)
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Connect your Google Account",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = FaturaColors.Ink,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Fatura saves scanned invoices straight to a Google Sheet you choose.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = FaturaColors.Muted,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            org.neteinstein.snap2sheet.ui.components.FaturaCard(containerColor = FaturaColors.SurfaceMuted, contentPadding = 4.dp) {
+                PermissionRow("View and manage your Google Sheets")
+                PermissionRow("See your name and email address")
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            FaturaPrimaryButton(
+                text = "Continue with Google",
+                onClick = {
+                    accountRepository.signIn()
+                    onSignedIn()
+                },
+            ) {
+                GoogleGlyph()
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = 32.dp, vertical = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                "By continuing you agree to Fatura's Terms of Service and Privacy Policy.",
+                style = MaterialTheme.typography.bodySmall,
+                color = FaturaColors.Muted,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PermissionRow(text: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        androidx.compose.foundation.Canvas(Modifier.size(18.dp)) {
+            val w = size.width
+            val h = size.height
+            val strokeWidth = w * 0.11f
+            drawCircle(
+                color = FaturaColors.Success,
+                radius = size.minDimension / 2,
+                style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth),
+            )
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(w * 0.28f, h * 0.52f)
+                lineTo(w * 0.44f, h * 0.68f)
+                lineTo(w * 0.74f, h * 0.34f)
+            }
+            drawPath(
+                path,
+                color = FaturaColors.Success,
+                style = androidx.compose.ui.graphics.drawscope.Stroke(
+                    width = strokeWidth,
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                    join = androidx.compose.ui.graphics.StrokeJoin.Round,
+                ),
+            )
+        }
+        Text(text, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = FaturaColors.Ink)
+    }
+}
+
+@Composable
+private fun GoogleGlyph() {
+    // A simplified four-color dot stands in for the Google "G" mark.
+    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        listOf(Color(0xFF4285F4), Color(0xFFEA4335), Color(0xFFFBBC05), Color(0xFF34A853)).forEach { c ->
+            androidx.compose.foundation.layout.Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(c))
+        }
+    }
+}

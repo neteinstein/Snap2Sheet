@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fatura mark: the same four-square "scan grid" glyph shown on the app's welcome screen,
+     scaled into the adaptive icon's safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="
+            M36.6,34.2 h11 v11 h-11 z
+            M60.8,34.2 h11 v11 h-11 z
+            M36.6,58.4 h11 v11 h-11 z
+            M60.8,58.4 h4.6 v4.6 h-4.6 z
+            M69.4,58.4 h4.6 v4.6 h-4.6 z
+            M60.8,67 h4.6 v4.6 h-4.6 z
+            M69.4,67 h4.6 v4.6 h-4.6 z" />
+</vector>
