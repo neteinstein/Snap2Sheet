@@ -5,9 +5,9 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.neteinstein.snap2sheet.data.local.platformKeyValueStore
 import org.neteinstein.snap2sheet.data.repository.AccountRepository
+import org.neteinstein.snap2sheet.data.repository.DefaultAccountRepository
 import org.neteinstein.snap2sheet.data.repository.DefaultSettingsRepository
 import org.neteinstein.snap2sheet.data.repository.InvoiceRepository
-import org.neteinstein.snap2sheet.data.repository.MockAccountRepository
 import org.neteinstein.snap2sheet.data.repository.MockInvoiceRepository
 import org.neteinstein.snap2sheet.data.repository.MockSpreadsheetRepository
 import org.neteinstein.snap2sheet.data.repository.SettingsRepository
@@ -21,7 +21,7 @@ import org.neteinstein.snap2sheet.ui.screens.settings.SettingsViewModel
 internal val appModule = module {
     single { platformKeyValueStore() }
     single { DefaultSettingsRepository(get()) } bind SettingsRepository::class
-    single { MockAccountRepository() } bind AccountRepository::class
+    single { DefaultAccountRepository() } bind AccountRepository::class
     single { MockInvoiceRepository() } bind InvoiceRepository::class
     single { MockSpreadsheetRepository() } bind SpreadsheetRepository::class
 
