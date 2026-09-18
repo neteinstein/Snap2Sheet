@@ -7,8 +7,7 @@ parsed and appended as a row to a Google Sheet you choose, no typing required.
 
 ## Stack
 
-Kotlin Multiplatform + Compose Multiplatform, targeting Android and iOS from one shared UI —
-the same architecture pattern as [neteinstein/loopgain](https://github.com/neteinstein/loopgain).
+Kotlin Multiplatform + Compose Multiplatform, targeting Android and iOS from one shared UI 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the layer breakdown.
 
 - Kotlin Multiplatform / Compose Multiplatform
