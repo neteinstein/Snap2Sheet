@@ -20,11 +20,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.neteinstein.snap2sheet.permission.PermissionStatus
+import org.neteinstein.snap2sheet.permission.rememberCameraPermissionState
 import org.neteinstein.snap2sheet.ui.components.FaturaCard
 import org.neteinstein.snap2sheet.ui.components.FaturaGhostButton
 import org.neteinstein.snap2sheet.ui.components.FaturaIcons
@@ -34,6 +37,16 @@ import org.neteinstein.snap2sheet.ui.theme.FaturaColors
 
 @Composable
 fun WelcomeScreen(onContinue: () -> Unit) {
+    val cameraPermission = rememberCameraPermissionState()
+
+    // Once the OS prompt has been answered (granted or denied), move on — camera access is
+    // requested up front but isn't required to keep browsing the rest of onboarding.
+    LaunchedEffect(cameraPermission.status) {
+        if (cameraPermission.status != PermissionStatus.NotDetermined) {
+            onContinue()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,7 +104,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                FaturaPrimaryButton(text = "Enable Camera Access", onClick = onContinue)
+                FaturaPrimaryButton(text = "Enable Camera Access", onClick = { cameraPermission.request() })
                 FaturaGhostButton(text = "Not now", onClick = onContinue)
             }
 

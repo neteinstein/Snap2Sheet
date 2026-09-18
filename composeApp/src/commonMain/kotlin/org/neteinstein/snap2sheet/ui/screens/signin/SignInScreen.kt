@@ -14,9 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.neteinstein.snap2sheet.auth.rememberGoogleSignInController
 import org.neteinstein.snap2sheet.data.repository.AccountRepository
 import org.neteinstein.snap2sheet.ui.components.FaturaIcons
 import org.neteinstein.snap2sheet.ui.components.FaturaPrimaryButton
@@ -38,6 +46,29 @@ fun SignInScreen(
     onSignedIn: () -> Unit,
     accountRepository: AccountRepository = koinInject(),
 ) {
+    val signInController = rememberGoogleSignInController()
+    val coroutineScope = rememberCoroutineScope()
+    var isSigningIn by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    fun signIn() {
+        if (isSigningIn) return
+        isSigningIn = true
+        errorMessage = null
+        coroutineScope.launch {
+            signInController.signIn()
+                .onSuccess { account ->
+                    accountRepository.setSignedIn(account)
+                    isSigningIn = false
+                    onSignedIn()
+                }
+                .onFailure { error ->
+                    isSigningIn = false
+                    errorMessage = error.message ?: "Couldn't sign in with Google."
+                }
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize().background(FaturaColors.Surface)) {
         FaturaTopBar(title = "", onBack = onBack)
 
@@ -74,14 +105,26 @@ fun SignInScreen(
 
             Spacer(Modifier.height(24.dp))
 
+            errorMessage?.let { message ->
+                Text(
+                    message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FaturaColors.Danger,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                )
+            }
+
             FaturaPrimaryButton(
-                text = "Continue with Google",
-                onClick = {
-                    accountRepository.signIn()
-                    onSignedIn()
-                },
+                text = if (isSigningIn) "Signing in…" else "Continue with Google",
+                enabled = !isSigningIn,
+                onClick = { signIn() },
             ) {
-                GoogleGlyph()
+                if (isSigningIn) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White)
+                } else {
+                    GoogleGlyph()
+                }
             }
         }
 
