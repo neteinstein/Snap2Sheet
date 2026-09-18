@@ -7,8 +7,8 @@ parsed and appended as a row to a Google Sheet you choose, no typing required.
 
 ## Stack
 
-Kotlin Multiplatform + Compose Multiplatform, targeting Android and iOS from one shared UI 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the layer breakdown.
+Kotlin Multiplatform + Compose Multiplatform, targeting Android, iOS and Web (Kotlin/Wasm) from
+one shared UI. See [ARCHITECTURE.md](ARCHITECTURE.md) for the layer breakdown.
 
 - Kotlin Multiplatform / Compose Multiplatform
 - Koin for dependency injection
@@ -23,6 +23,7 @@ composeApp/          Shared KMP module
   src/commonMain/     domain/, data/, ui/ (screens, components, theme, navigation), di/
   src/androidMain/    Android actuals (KeyValueStore, app Context)
   src/iosMain/        iOS actuals (KeyValueStore, MainViewController)
+  src/wasmJsMain/     Web actuals (KeyValueStore backed by localStorage) + main.kt + index.html
 androidApp/           Android application entry point
 iosApp/               iOS application wrapper (SwiftUI + Xcode project)
 ```
@@ -49,3 +50,16 @@ Wiring up real Google OAuth and the Sheets API is tracked separately — see the
 iOS: open `iosApp/iosApp.xcodeproj` in Xcode, or build the `composeApp` framework via Gradle
 first (`./gradlew :composeApp:embedAndSignAppleFrameworkForXcode` from Xcode's build phase, as
 usual for a KMP project).
+
+Web:
+
+```bash
+./gradlew :composeApp:wasmJsBrowserDevelopmentRun   # dev server with hot reload
+./gradlew :composeApp:wasmJsBrowserDistribution      # production build -> composeApp/build/dist/wasmJs/productionExecutable
+```
+
+## Web deployment
+
+Pushes to `main` build the Kotlin/Wasm web target and publish it to GitHub Pages via
+[`.github/workflows/deploy-web.yml`](.github/workflows/deploy-web.yml). Enable Pages for the
+repo once under Settings → Pages → Source → GitHub Actions.
